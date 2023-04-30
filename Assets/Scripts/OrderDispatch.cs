@@ -9,13 +9,14 @@ public class OrderDispatch : MonoBehaviour
     public Transform[] customers;
     public Order currentOrder;
 
-    public Player player;
+    public DeliveryArrow arrow;
 
     public GameObject pickUpSensor;
     public GameObject deliverySensor;
     public GameObject phone;
     public TextMeshProUGUI offerText;
     public TextMeshProUGUI payText;
+    public GameManager gameManager;
 
     private float nextOrderDelay = 0f;
 
@@ -26,21 +27,18 @@ public class OrderDispatch : MonoBehaviour
 
     private void Update()
     {
-        if (!player.hasCurrentOrder && Time.time > nextOrderDelay)
+        if (Time.time > nextOrderDelay && currentOrder.isActive == false)
         {
             SendOffer();
         }
-
-        if (player.currentOrder.isPickedUp && player.currentOrder.isDelivered == false)
+        else if (currentOrder.isPickedUp && currentOrder.isDelivered == false)
         {
-            pickUpSensor.SetActive(false);
-            deliverySensor.SetActive(true);
+            CompletePickUp();
         }
 
-        if (player.currentOrder.isDelivered)
+        else if (currentOrder.isDelivered)
         {
-            deliverySensor.SetActive(false);
-            GenerateRandomOrder();
+            CompleteDelivery();
         }
     }
 
@@ -50,30 +48,61 @@ public class OrderDispatch : MonoBehaviour
         currentOrder.deliveryPoint = customers[Random.Range(0, customers.Length)];
         float distance = Vector2.Distance(currentOrder.pickUpPoint.position, currentOrder.deliveryPoint.position);
         currentOrder.pay = distance / 4f;
-    } 
+    }
 
     public void SendOffer()
     {
+        GenerateRandomOrder();
+
         phone.SetActive(true);
+        currentOrder.isActive = true;
         offerText.text = "New Order From: " + currentOrder.restarauntName;
         payText.text = "$ " + currentOrder.pay.ToString("N2");
-        nextOrderDelay = Time.time + Random.Range(3, 6);
+        nextOrderDelay = Time.time + Random.Range(3, 8);
+    }
+
+    private void CompletePickUp()
+    {
+        pickUpSensor.SetActive(false);
+        deliverySensor.SetActive(true);
+        arrow.target = deliverySensor.transform;
+    }
+
+    private void CompleteDelivery()
+    {
+        gameManager.AddPay(currentOrder.pay);
+
+        // disable delivery sensor and arrow
+        deliverySensor.SetActive(false);
+        arrow.gameObject.SetActive(false);
+
+        // reset current order
+        currentOrder.isActive = false;
+        currentOrder.isPickedUp = false;
+        currentOrder.isDelivered = false;
     }
 
     public void AcceptOffer()
     {
         phone.SetActive(false);
-        player.hasCurrentOrder = true;
         currentOrder.isActive = true;
-        player.currentOrder = currentOrder;
+
+        // move the sensors to the order's pick up and delivery points
         pickUpSensor.transform.position = currentOrder.pickUpPoint.position;
         deliverySensor.transform.position = currentOrder.deliveryPoint.position;
+
+        // activate the pick up sensor
         pickUpSensor.SetActive(true);
+
+        // activate the navigation arrow and set it's target to the pick up location
+        arrow.gameObject.SetActive(true);
+        arrow.target = pickUpSensor.transform;
     }
 
     public void DeclineOffer()
     {
-        GenerateRandomOrder();
         phone.SetActive(false);
+        currentOrder.isActive = false;
+        nextOrderDelay = Time.time + Random.Range(3, 8);
     }
 }

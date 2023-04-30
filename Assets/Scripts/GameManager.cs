@@ -6,17 +6,17 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public TextMeshProUGUI moneyText;
-    public Player player;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private float money;
 
     // Update is called once per frame
     void Update()
     {
-        moneyText.text = "$ " + player.money.ToString("N2");
+        moneyText.text = "$ " + money.ToString("N2");
+    }
+
+    public void AddPay(float pay)
+    {
+        money += pay;
     }
 }

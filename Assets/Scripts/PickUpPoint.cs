@@ -6,16 +6,17 @@ public class PickUpPoint : MonoBehaviour
 {
     public string restarauntName;
 
-    private Player player;
+    private OrderDispatch dispatch;
 
     private void Awake()
     {
-        player = GameObject.Find("Player").GetComponent<Player>();
+        dispatch = GameObject.Find("Order Dispatch").GetComponent<OrderDispatch>();
+        restarauntName = dispatch.currentOrder.restarauntName;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("Order Picked Up From " + restarauntName);
-        player.currentOrder.isPickedUp = true;
+        dispatch.currentOrder.isPickedUp = true;
     }
 }
