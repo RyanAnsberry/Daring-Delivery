@@ -24,15 +24,12 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         turningInput = Input.GetAxis("Horizontal");
         accelerationInput = Input.GetAxis("Vertical");
-    }
 
-    private void FixedUpdate()
-    {
+
         ApplyEngineForce();
 
         StopOrthogonaVelocity();
@@ -44,6 +41,12 @@ public class PlayerController : MonoBehaviour
     {
         // Calculate how "forward" the car is moving in terms velocity
         velocityVsUp = Vector2.Dot(transform.up, body.velocity);
+
+        if (velocityVsUp < 0)
+        {
+            float invertedTurning = -turningInput;
+            turningInput = invertedTurning;
+        }
 
         // limit forward movement by the max speed
         if (velocityVsUp > maxSpeed && accelerationInput > 0)
