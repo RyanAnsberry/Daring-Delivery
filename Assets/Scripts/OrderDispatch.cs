@@ -16,29 +16,29 @@ public class OrderDispatch : MonoBehaviour
     public GameObject phone;
     public TextMeshProUGUI offerText;
     public TextMeshProUGUI payText;
+    public TextMeshProUGUI distanceText;
     public GameManager gameManager;
 
     private float nextOrderDelay = 0f;
 
-    private void Start()
-    {
-            GenerateRandomOrder();
-    }
 
     private void Update()
     {
-        if (Time.time > nextOrderDelay && currentOrder.isActive == false)
+        if (gameManager.isGameActive)
         {
-            SendOffer();
-        }
-        else if (currentOrder.isPickedUp && currentOrder.isDelivered == false)
-        {
-            CompletePickUp();
-        }
+            if (Time.time > nextOrderDelay && currentOrder.isActive == false)
+            {
+                SendOffer();
+            }
+            else if (currentOrder.isPickedUp && currentOrder.isDelivered == false)
+            {
+                CompletePickUp();
+            }
 
-        else if (currentOrder.isDelivered)
-        {
-            CompleteDelivery();
+            else if (currentOrder.isDelivered)
+            {
+                CompleteDelivery();
+            }
         }
     }
 
@@ -47,6 +47,7 @@ public class OrderDispatch : MonoBehaviour
         currentOrder = orders[Random.Range(0, orders.Length)];
         currentOrder.deliveryPoint = customers[Random.Range(0, customers.Length)];
         float distance = Vector2.Distance(currentOrder.pickUpPoint.position, currentOrder.deliveryPoint.position);
+        distanceText.text = distance.ToString("N1") + " m";
         currentOrder.pay = distance / 4f;
     }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] GameManager gameManager;
     [SerializeField] float driftFactor = 0.95f;
     [SerializeField] float accelerationRate = 20f;
     [SerializeField] float turningRate = 3.5f;
@@ -26,15 +27,18 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        turningInput = Input.GetAxis("Horizontal");
-        accelerationInput = Input.GetAxis("Vertical");
+        if (gameManager.isGameActive)
+        {
+            turningInput = Input.GetAxis("Horizontal");
+            accelerationInput = Input.GetAxis("Vertical");
 
 
-        ApplyEngineForce();
+            ApplyEngineForce();
 
-        StopOrthogonaVelocity();
+            StopOrthogonaVelocity();
 
-        ApplySteering();
+            ApplySteering();
+        }
     }
 
     void ApplyEngineForce()
